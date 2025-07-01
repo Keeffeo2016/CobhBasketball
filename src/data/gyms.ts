@@ -3,20 +3,20 @@ import { Gym, TimeSlot } from '../types/booking';
 export const gyms: Gym[] = [
   {
     id: 'gym-1',
-    name: 'FitZone Downtown',
-    location: '123 Main Street',
+    name: 'Coral Leisure Cobh',
+    location: 'Carrignafoy, Cobh, Co. Cork, P24 X953',
     color: 'from-blue-500 to-blue-600'
   },
   {
     id: 'gym-2',
-    name: 'PowerHouse Westside',
-    location: '456 Oak Avenue',
+    name: 'Next Generation Gym',
+    location: 'Unit 4B, Ticknock Retail Park, Cobh, Co. Cork',
     color: 'from-emerald-500 to-emerald-600'
   },
   {
     id: 'gym-3',
-    name: 'Elite Fitness Center',
-    location: '789 Pine Boulevard',
+    name: 'NUADHA Fitness',
+    location: '7P24 HF79, Tay Road, Cobh, Co. Cork',
     color: 'from-purple-500 to-purple-600'
   }
 ];
