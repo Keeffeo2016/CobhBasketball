@@ -8,7 +8,7 @@ interface BookingModalProps {
   gym: Gym;
   date: string;
   timeSlot: TimeSlot;
-  onConfirm: (clientName: string, clientPhone: string) => void;
+  onConfirm: (clientName: string) => void;
 }
 
 export const BookingModal: React.FC<BookingModalProps> = ({
@@ -20,18 +20,15 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   onConfirm
 }) => {
   const [clientName, setClientName] = useState('');
-  const [clientPhone, setClientPhone] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!clientName.trim() || !clientPhone.trim()) return;
-    
+    if (!clientName.trim()) return;
     setIsSubmitting(true);
     await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API call
-    onConfirm(clientName.trim(), clientPhone.trim());
+    onConfirm(clientName.trim());
     setClientName('');
-    setClientPhone('');
     setIsSubmitting(false);
     onClose();
   };
@@ -93,23 +90,6 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Phone Number
-            </label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="tel"
-                value={clientPhone}
-                onChange={(e) => setClientPhone(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter phone number"
-                required
-              />
-            </div>
-          </div>
-
           <div className="flex gap-3 pt-4">
             <button
               type="button"
@@ -120,7 +100,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             </button>
             <button
               type="submit"
-              disabled={isSubmitting || !clientName.trim() || !clientPhone.trim()}
+              disabled={isSubmitting || !clientName.trim()}
               className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isSubmitting ? 'Booking...' : 'Confirm Booking'}

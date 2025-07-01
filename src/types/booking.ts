@@ -4,7 +4,7 @@ export interface Booking {
   date: string;
   timeSlot: string;
   clientName: string;
-  clientPhone: string;
+  clientPhone?: string;
   createdAt: string;
 }
 

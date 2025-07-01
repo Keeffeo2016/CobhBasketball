@@ -95,14 +95,13 @@ export const Dashboard: React.FC = () => {
     });
   };
 
-  const handleConfirmBooking = (clientName: string, clientPhone: string) => {
+  const handleConfirmBooking = (clientName: string) => {
     if (bookingModal.gym && bookingModal.timeSlot && bookingModal.date) {
       addBooking({
         gymId: bookingModal.gym.id,
         date: bookingModal.date,
         timeSlot: bookingModal.timeSlot.time,
-        clientName,
-        clientPhone
+        clientName
       });
     }
   };
