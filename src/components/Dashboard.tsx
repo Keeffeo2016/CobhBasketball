@@ -5,6 +5,8 @@ import { BookingModal } from './BookingModal';
 import { gyms } from '../data/gyms';
 import { useBookings } from '../hooks/useBookings';
 import { Gym, TimeSlot } from '../types/booking';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 export const Dashboard: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(() => {
@@ -16,6 +18,7 @@ export const Dashboard: React.FC = () => {
     start: '',
     end: '',
   });
+  const [exportFormat, setExportFormat] = useState<'csv' | 'pdf'>('csv');
   
   const [bookingModal, setBookingModal] = useState<{
     isOpen: boolean;
@@ -62,28 +65,32 @@ export const Dashboard: React.FC = () => {
       const bd = new Date(b.date);
       return bd >= start && bd <= end;
     });
-    const csvRows = [
-      ['Gym Name', 'Date', 'Time Slot', 'Client Name', 'Client Phone', 'Created At'],
-      ...exportBookings.map((b: typeof bookings[number]) => {
-        const gym = gyms.find(g => g.id === b.gymId);
-        return [
-          gym ? gym.name : b.gymId,
-          b.date,
-          b.timeSlot,
-          b.clientName,
-          b.clientPhone,
-          b.createdAt,
-        ];
-      }),
-    ];
-    const csvContent = csvRows.map((row: string[]) => row.map((s: string) => '"' + s.replace(/"/g, '""') + '"').join(',')).join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `bookings_${exportRange.start}_to_${exportRange.end}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const headers = ['Gym Name', 'Date', 'Time Slot', 'Client Name', 'Created At'];
+    const rows = exportBookings.map((b: typeof bookings[number]) => {
+      const gym = gyms.find(g => g.id === b.gymId);
+      return [
+        gym ? gym.name : b.gymId,
+        b.date,
+        b.timeSlot,
+        b.clientName,
+        b.createdAt,
+      ];
+    });
+    if (exportFormat === 'csv') {
+      const csvRows = [headers, ...rows];
+      const csvContent = csvRows.map((row: string[]) => row.map((s: string) => '"' + s.replace(/"/g, '""') + '"').join(',')).join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `bookings_${exportRange.start}_to_${exportRange.end}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } else if (exportFormat === 'pdf') {
+      const doc = new jsPDF();
+      (doc as any).autoTable({ head: [headers], body: rows });
+      doc.save(`bookings_${exportRange.start}_to_${exportRange.end}.pdf`);
+    }
   };
 
   const handleBookSlot = (gym: Gym, timeSlot: TimeSlot, date: string) => {
@@ -154,6 +161,10 @@ export const Dashboard: React.FC = () => {
           <input type="date" value={exportRange.start} onChange={e => setExportRange(r => ({...r, start: e.target.value}))} className="border rounded px-2 py-1" />
           <label className="text-gray-700">to</label>
           <input type="date" value={exportRange.end} onChange={e => setExportRange(r => ({...r, end: e.target.value}))} className="border rounded px-2 py-1" />
+          <select value={exportFormat} onChange={e => setExportFormat(e.target.value as 'csv' | 'pdf')} className="border rounded px-2 py-1">
+            <option value="csv">CSV</option>
+            <option value="pdf">PDF</option>
+          </select>
           <button onClick={handleExport} className="px-4 py-2 bg-green-600 text-white rounded-lg">Export</button>
         </div>
 
