@@ -140,7 +140,8 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
+        <div className="mb-8 text-center">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLs6W3yVhbL8mjuv6vMW6rjUF2Et_EYGO-Wg&s" alt="Cobh Basketball Logo" className="mx-auto mb-4" style={{ maxHeight: 100 }} />
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Cobh Basketball Gym Booking
           </h1>
