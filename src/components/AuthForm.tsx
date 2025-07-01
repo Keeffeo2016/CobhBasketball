@@ -2,7 +2,12 @@ import React, { useState } from 'react';
 import { auth } from '../firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 
-const AuthForm: React.FC = () => {
+interface AuthFormProps {
+  hideRegister?: boolean;
+  onClose?: () => void;
+}
+
+const AuthForm: React.FC<AuthFormProps> = ({ hideRegister = false, onClose }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -28,7 +33,10 @@ const AuthForm: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm space-y-4">
+      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm space-y-4 relative">
+        {onClose && (
+          <button type="button" onClick={onClose} className="absolute top-2 right-2 text-gray-400 hover:text-gray-700">&times;</button>
+        )}
         <h2 className="text-2xl font-bold text-center mb-2">
           {mode === 'login' ? 'Admin Login' : 'Register Admin'}
         </h2>
@@ -60,23 +68,25 @@ const AuthForm: React.FC = () => {
         >
           {loading ? (mode === 'login' ? 'Logging in...' : 'Registering...') : (mode === 'login' ? 'Login' : 'Register')}
         </button>
-        <div className="text-center text-sm mt-2">
-          {mode === 'login' ? (
-            <>
-              Don&apos;t have an account?{' '}
-              <button type="button" className="text-blue-600 underline" onClick={() => setMode('register')}>
-                Register
-              </button>
-            </>
-          ) : (
-            <>
-              Already have an account?{' '}
-              <button type="button" className="text-blue-600 underline" onClick={() => setMode('login')}>
-                Login
-              </button>
-            </>
-          )}
-        </div>
+        {!hideRegister && (
+          <div className="text-center text-sm mt-2">
+            {mode === 'login' ? (
+              <>
+                Don&apos;t have an account?{' '}
+                <button type="button" className="text-blue-600 underline" onClick={() => setMode('register')}>
+                  Register
+                </button>
+              </>
+            ) : (
+              <>
+                Already have an account?{' '}
+                <button type="button" className="text-blue-600 underline" onClick={() => setMode('login')}>
+                  Login
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </form>
     </div>
   );
