@@ -11,7 +11,7 @@ export interface Booking {
 export interface Gym {
   id: string;
   name: string;
-  location: string;
+  location?: string;
   color: string;
 }
 
