@@ -2,7 +2,6 @@ import React from 'react';
 import { Clock, User, Trash2 } from 'lucide-react';
 import { Gym, TimeSlot, Booking } from '../types/booking';
 import { timeSlots } from '../data/gyms';
-import { useAuth } from '../App';
 
 interface TimeSlotGridProps {
   gym: Gym;
@@ -19,8 +18,6 @@ export const TimeSlotGrid: React.FC<TimeSlotGridProps> = ({
   onBookSlot,
   onCancelBooking
 }) => {
-  const { user } = useAuth();
-
   const getBookingForSlot = (date: string, timeSlot: string) => {
     return bookings.find(
       booking => booking.gymId === gym.id && booking.date === date && booking.timeSlot === timeSlot
