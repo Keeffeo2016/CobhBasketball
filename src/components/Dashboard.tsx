@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { DateNavigator } from './DateNavigator';
 import { TimeSlotGrid } from './TimeSlotGrid';
 import { BookingModal } from './BookingModal';
-import { gyms } from '../data/gyms';
+import { gyms, getTimeSlotsForDate } from '../data/gyms';
 import { useBookings } from '../hooks/useBookings';
 import { Gym, TimeSlot } from '../types/booking';
 import jsPDF from 'jspdf';
@@ -55,6 +55,14 @@ export const Dashboard: React.FC = () => {
   if (view === 'daily') filteredBookings = getBookingsForDate(selectedDate);
   else if (view === 'weekly') filteredBookings = getBookingsForWeek(selectedDate);
   else filteredBookings = getBookingsForMonth(selectedDate);
+
+  // Helper to calculate total available slots for a date range
+  const getTotalAvailableSlots = (dates: string[]) => {
+    return dates.reduce((total, date) => {
+      const slotsForDate = getTimeSlotsForDate(date);
+      return total + (gyms.length * slotsForDate.length);
+    }, 0);
+  };
 
   // Export logic
   const handleExport = () => {
@@ -120,22 +128,23 @@ export const Dashboard: React.FC = () => {
   };
 
   const totalBookings = filteredBookings.length;
-  const availableSlots = gyms.length * 11 - totalBookings; // 11 slots per gym
-
-  // Helper to get array of dates for week
-  const getWeekDates = (date: string) => {
-    const d = new Date(date);
+  
+  // Calculate available slots based on current view
+  let gridDates: string[] = [];
+  if (view === 'daily') gridDates = [selectedDate];
+  else if (view === 'weekly') {
+    const d = new Date(selectedDate);
     const start = new Date(d);
     start.setDate(d.getDate() - d.getDay()); // Sunday
-    return Array.from({ length: 7 }, (_, i) => {
+    gridDates = Array.from({ length: 7 }, (_, i) => {
       const dt = new Date(start);
       dt.setDate(start.getDate() + i);
       return dt.toISOString().split('T')[0];
     });
-  };
-  let gridDates: string[] = [];
-  if (view === 'daily') gridDates = [selectedDate];
-  else if (view === 'weekly') gridDates = getWeekDates(selectedDate);
+  }
+  
+  const totalAvailableSlots = getTotalAvailableSlots(gridDates);
+  const availableSlots = totalAvailableSlots - totalBookings;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -204,7 +213,7 @@ export const Dashboard: React.FC = () => {
               <div>
                 <p className="text-sm font-medium text-gray-600">Occupancy Rate</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {Math.round((totalBookings / (gyms.length * 11)) * 100)}%
+                  {totalAvailableSlots > 0 ? Math.round((totalBookings / totalAvailableSlots) * 100) : 0}%
                 </p>
               </div>
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
