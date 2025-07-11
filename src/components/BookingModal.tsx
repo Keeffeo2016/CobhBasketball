@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, User, Phone, Calendar, Clock } from 'lucide-react';
+import { X, User, Calendar, Clock } from 'lucide-react';
 import { Gym, TimeSlot } from '../types/booking';
 
 interface BookingSlot {
@@ -59,8 +59,6 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       day: 'numeric'
     });
   };
-
-  const slotsToShow = isBlockBooking && blockSlots.length > 0 ? blockSlots : [{ gym, date, timeSlot }];
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
