@@ -13,7 +13,7 @@ export const Dashboard: React.FC = () => {
     const today = new Date();
     return today.toISOString().split('T')[0];
   });
-  const [view, setView] = useState<'daily' | 'weekly'>('daily');
+  const [view] = useState<'daily'>('daily');
   const [exportRange, setExportRange] = useState<{ start: string; end: string }>({
     start: '',
     end: '',
@@ -29,32 +29,7 @@ export const Dashboard: React.FC = () => {
 
   const { bookings, addBooking, removeBooking, getBookingsForDate } = useBookings();
 
-  // Helper to get bookings for week
-  const getBookingsForWeek = (date: string) => {
-    const d = new Date(date);
-    const start = new Date(d);
-    start.setDate(d.getDate() - d.getDay()); // Sunday
-    const end = new Date(start);
-    end.setDate(start.getDate() + 6); // Saturday
-    return bookings.filter((b: typeof bookings[number]) => {
-      const bd = new Date(b.date);
-      return bd >= start && bd <= end;
-    });
-  };
-  // Helper to get bookings for month
-  const getBookingsForMonth = (date: string) => {
-    const d = new Date(date);
-    const month = d.getMonth();
-    const year = d.getFullYear();
-    return bookings.filter((b: typeof bookings[number]) => {
-      const bd = new Date(b.date);
-      return bd.getMonth() === month && bd.getFullYear() === year;
-    });
-  };
-  let filteredBookings: typeof bookings = [];
-  if (view === 'daily') filteredBookings = getBookingsForDate(selectedDate);
-  else if (view === 'weekly') filteredBookings = getBookingsForWeek(selectedDate);
-  else filteredBookings = getBookingsForMonth(selectedDate);
+  let filteredBookings: typeof bookings = getBookingsForDate(selectedDate);
 
   // Helper to calculate total available slots for a date range
   const getTotalAvailableSlots = (dates: string[]) => {
@@ -129,110 +104,143 @@ export const Dashboard: React.FC = () => {
 
   const totalBookings = filteredBookings.length;
   
-  // Calculate available slots based on current view
-  let gridDates: string[] = [];
-  if (view === 'daily') gridDates = [selectedDate];
-  else if (view === 'weekly') {
-    const d = new Date(selectedDate);
-    const start = new Date(d);
-    start.setDate(d.getDate() - d.getDay()); // Sunday
-    gridDates = Array.from({ length: 7 }, (_, i) => {
-      const dt = new Date(start);
-      dt.setDate(start.getDate() + i);
-      return dt.toISOString().split('T')[0];
-    });
-  }
+  // Calculate available slots for daily view
+  let gridDates: string[] = [selectedDate];
   
   const totalAvailableSlots = getTotalAvailableSlots(gridDates);
   const availableSlots = totalAvailableSlots - totalBookings;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8 text-center">
-          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLs6W3yVhbL8mjuv6vMW6rjUF2Et_EYGO-Wg&s" alt="Cobh Basketball Logo" className="mx-auto mb-4" style={{ maxHeight: 100 }} />
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Cobh Basketball Gym Booking
-          </h1>
-          <p className="text-gray-600">
-            Manage bookings across your gym locations
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Header Section */}
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row items-center justify-between py-6">
+            <div className="flex items-center space-x-4 mb-4 sm:mb-0">
+              <img 
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLs6W3yVhbL8mjuv6vMW6rjUF2Et_EYGO-Wg&s" 
+                alt="Cobh Basketball Logo" 
+                className="h-12 w-auto" 
+              />
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                  Cobh Basketball
+                </h1>
+                <p className="text-gray-600 text-sm sm:text-base">
+                  Gym Booking System
+                </p>
+              </div>
+            </div>
+            
+
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Date Navigator */}
+        <div className="mb-8">
+          <DateNavigator 
+            selectedDate={selectedDate}
+            onDateChange={setSelectedDate}
+          />
         </div>
 
-        {/* View Switcher */}
-        <div className="flex gap-4 mb-4">
-          <button onClick={() => setView('daily')} className={`px-4 py-2 rounded-lg border ${view==='daily'?'bg-blue-600 text-white':'bg-white text-gray-700'}`}>Daily</button>
-          <button onClick={() => setView('weekly')} className={`px-4 py-2 rounded-lg border ${view==='weekly'?'bg-blue-600 text-white':'bg-white text-gray-700'}`}>Weekly</button>
-        </div>
-
-        {/* Export Section */}
-        <div className="flex gap-2 items-center mb-4">
-          <label className="text-gray-700">Export from</label>
-          <input type="date" value={exportRange.start} onChange={e => setExportRange(r => ({...r, start: e.target.value}))} className="border rounded px-2 py-1" />
-          <label className="text-gray-700">to</label>
-          <input type="date" value={exportRange.end} onChange={e => setExportRange(r => ({...r, end: e.target.value}))} className="border rounded px-2 py-1" />
-          <select value={exportFormat} onChange={e => setExportFormat(e.target.value as 'csv' | 'pdf')} className="border rounded px-2 py-1">
-            <option value="csv">CSV</option>
-            <option value="pdf">PDF</option>
-          </select>
-          <button onClick={handleExport} className="px-4 py-2 bg-green-600 text-white rounded-lg">Export</button>
-        </div>
-
-        <DateNavigator 
-          selectedDate={selectedDate}
-          onDateChange={setSelectedDate}
-        />
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Bookings</p>
-                <p className="text-2xl font-bold text-gray-900">{totalBookings}</p>
+                <p className="text-3xl font-bold text-gray-900">{totalBookings}</p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <div className="w-6 h-6 bg-blue-600 rounded-sm" />
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                <div className="w-6 h-6 bg-blue-600 rounded-lg" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Available Slots</p>
-                <p className="text-2xl font-bold text-gray-900">{availableSlots}</p>
+                <p className="text-3xl font-bold text-gray-900">{availableSlots}</p>
               </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <div className="w-6 h-6 bg-green-600 rounded-sm" />
+              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                <div className="w-6 h-6 bg-green-600 rounded-lg" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Occupancy Rate</p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-3xl font-bold text-gray-900">
                   {totalAvailableSlots > 0 ? Math.round((totalBookings / totalAvailableSlots) * 100) : 0}%
                 </p>
               </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <div className="w-6 h-6 bg-purple-600 rounded-sm" />
+              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                <div className="w-6 h-6 bg-purple-600 rounded-lg" />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        {/* Export Section */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Export Bookings</h3>
+          <div className="flex flex-col sm:flex-row gap-4 items-end">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+              <div className="flex gap-2">
+                <input 
+                  type="date" 
+                  value={exportRange.start} 
+                  onChange={e => setExportRange(r => ({...r, start: e.target.value}))} 
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                />
+                <span className="flex items-center text-gray-500">to</span>
+                <input 
+                  type="date" 
+                  value={exportRange.end} 
+                  onChange={e => setExportRange(r => ({...r, end: e.target.value}))} 
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                />
+              </div>
+            </div>
+            <div className="w-full sm:w-32">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Format</label>
+              <select 
+                value={exportFormat} 
+                onChange={e => setExportFormat(e.target.value as 'csv' | 'pdf')} 
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="csv">CSV</option>
+                <option value="pdf">PDF</option>
+              </select>
+            </div>
+            <button 
+              onClick={handleExport} 
+              className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+            >
+              Export
+            </button>
+          </div>
+        </div>
+
+        {/* Gym Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {gyms.map((gym) => (
-            <TimeSlotGrid
-              key={gym.id}
-              gym={gym}
-              dates={gridDates}
-              bookings={filteredBookings}
-              onBookSlot={handleBookSlot}
-              onCancelBooking={handleCancelBooking}
-            />
+            <div key={gym.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <TimeSlotGrid
+                gym={gym}
+                dates={gridDates}
+                bookings={filteredBookings}
+                onBookSlot={handleBookSlot}
+                onCancelBooking={handleCancelBooking}
+              />
+            </div>
           ))}
         </div>
 

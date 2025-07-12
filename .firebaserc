@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "cobhbasketball-5f0a1"
-  }
+    "default": "cobh-basketball-booking",
+    "live": "cobh-basketball-booking"
+  },
+  "targets": {},
+  "etags": {}
 }

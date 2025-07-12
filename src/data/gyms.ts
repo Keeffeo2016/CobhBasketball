@@ -4,16 +4,19 @@ export const gyms: Gym[] = [
   {
     id: 'gym-1',
     name: 'Colaiste Muire',
+    location: 'Cobh, Co. Cork',
     color: 'from-blue-500 to-blue-600'
   },
   {
     id: 'gym-2',
     name: 'Rushbrooke',
+    location: 'Rushbrooke, Cobh',
     color: 'from-emerald-500 to-emerald-600'
   },
   {
     id: 'gym-3',
-    name: 'Community centre',
+    name: 'Community Centre',
+    location: 'Cobh Town Centre',
     color: 'from-purple-500 to-purple-600'
   }
 ];
