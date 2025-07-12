@@ -113,26 +113,42 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header Section */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between py-6">
-            <div className="flex items-center space-x-4 mb-4 sm:mb-0">
-              <img 
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLs6W3yVhbL8mjuv6vMW6rjUF2Et_EYGO-Wg&s" 
-                alt="Cobh Basketball Logo" 
-                className="h-12 w-auto" 
-              />
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+          <div className="flex flex-col sm:flex-row items-center justify-between py-8">
+            <div className="flex items-center space-x-6 mb-6 sm:mb-0">
+              {/* Cobh Basketball Logo */}
+              <div className="relative">
+                <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-red-500 p-2">
+                  <img 
+                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLs6W3yVhbL8mjuv6vMW6rjUF2Et_EYGO-Wg&s" 
+                    alt="Cobh Basketball Logo" 
+                    className="w-16 h-16 object-contain rounded-full" 
+                  />
+                </div>
+              </div>
+              
+              <div className="text-center sm:text-left">
+                <h1 className="text-3xl sm:text-4xl font-bold text-white mb-1 tracking-tight">
                   Cobh Basketball
                 </h1>
-                <p className="text-gray-600 text-sm sm:text-base">
-                  Gym Booking System
-                </p>
+                <div className="flex items-center justify-center sm:justify-start space-x-2">
+                  <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+                  <p className="text-blue-100 text-lg font-medium">
+                    Gym Booking System
+                  </p>
+                  <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+                </div>
               </div>
             </div>
             
-
+            {/* Header Actions */}
+            <div className="flex items-center space-x-4">
+              <div className="hidden sm:flex items-center space-x-2 text-blue-100">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-sm font-medium">Live Booking System</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
